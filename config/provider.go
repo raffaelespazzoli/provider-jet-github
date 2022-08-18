@@ -23,12 +23,15 @@ import (
 	tjconfig "github.com/crossplane/terrajet/pkg/config"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
-	"github.com/crossplane-contrib/provider-jet-template/config/null"
+	"github.com/crossplane-contrib/provider-jet-github/config/branch"
+	"github.com/crossplane-contrib/provider-jet-github/config/organization_webhook"
+	"github.com/crossplane-contrib/provider-jet-github/config/repository"
+	"github.com/crossplane-contrib/provider-jet-github/config/repository_webhook"
 )
 
 const (
-	resourcePrefix = "template"
-	modulePath     = "github.com/crossplane-contrib/provider-jet-template"
+	resourcePrefix = "github"
+	modulePath     = "github.com/crossplane-contrib/provider-jet-github"
 )
 
 //go:embed schema.json
@@ -44,11 +47,20 @@ func GetProvider() *tjconfig.Provider {
 	}
 
 	pc := tjconfig.NewProviderWithSchema([]byte(providerSchema), resourcePrefix, modulePath,
-		tjconfig.WithDefaultResourceFn(defaultResourceFn))
+		tjconfig.WithDefaultResourceFn(defaultResourceFn),
+		tjconfig.WithIncludeList([]string{
+			"github_repository$",
+			"github_branch$",
+			"github_repository_webhook$",
+			"github_organization_webhook$",
+		}))
 
 	for _, configure := range []func(provider *tjconfig.Provider){
 		// add custom config functions
-		null.Configure,
+		repository.Configure,
+		branch.Configure,
+		repository_webhook.Configure,
+		organization_webhook.Configure,
 	} {
 		configure(pc)
 	}

@@ -9,3 +9,6 @@ cover.out
 # ignore IDE folders
 .vscode/
 .idea/
+
+/examples/provider/secret.yaml
+examples/repository_webhook/secret.yaml
